@@ -27,11 +27,16 @@ const buildModel = (f,w,n) => {
     variables: {},
   };
 
-  tuples(n).forEach(({ a, x, b }) => {
+  // reversing the order so that tuples with more coverage appear first
+  // seems to affect which variables are selected. for example, n=3, 
+  // w=coverage, f=mc -> theta in { (0,0,1), (1,0,1) } when the interated
+  // order is used, but the second point is (1,0,2) when reversed. I
+  // have no idea what that means.
+  tuples(n).reverse().forEach(({ a, x, b }) => {
     model.variables[`${a}-${x}-${b}`] = {
-      defectionTerm: a * f(a+x) - b * f(a + x +1),
-      wax: w(a + x),
-      wxb: w(x + b),
+      defectionTerm: a * f(a+x) - b * f(a + x +1), // A^T
+      wax: w(a + x), // B^T
+      wxb: w(x + b), // C^T
     };
   });
 
