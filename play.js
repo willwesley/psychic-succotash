@@ -16,7 +16,7 @@ if(process.argv[2] === "mc") {
   console.log("cover mc 3: ", solver.Solve(cmc3))
   console.table(cmc3.variables)
   const cmc20 = buildModel(fmc(20),w(20),20)
-  //console.log("cover mc 20: ", solver.Solve(cmc20))
+  console.log("cover mc 20: ", solver.Solve(cmc20))
   //console.table(cmc20.variables)
 
   // seems legit, pretty consistently get poa 1/2
@@ -38,11 +38,14 @@ if(process.argv[2] === "es") {
   const ces3 = buildModel(fes(3),w(3),3)
   console.log("cover es 3: ", solver.Solve(ces3))
   console.table(ces3.variables)
+  const ces4 = buildModel(fes(4),w(4),4)
+  console.log("cover es 4: ", solver.Solve(ces4))
+  console.table(ces4.variables)
   const ces20 = buildModel(fes(20),w(20),20)
-  console.log("cover es 20: ", solver.Solve(ces20))
+  //console.log("cover es 20: ", solver.Solve(ces20))
   //console.table(ces20.variables)
-  const ces200 = buildModel(fes(200),w(200),200)
-  console.log("cover es 200: ", solver.Solve(ces200))
+  //const ces200 = buildModel(fes(200),w(200),200)
+  //console.log("cover es 200: ", solver.Solve(ces200))
   //console.table(ces200.variables) // haha, don't do this?
 
   // my guess here is that this method tends toward poa 1/2
