@@ -8,14 +8,8 @@ const tuples = n => {
       I[aN][xN] = [];
       for(let bN = 0; aN+xN+bN <= n; bN++) {
         I[aN][xN][bN] = [];
-        for(let aB = 0; aN+xN+bN+aB <= n; aB++) {
-          I[aN][xN][bN][aB] = [];
-          for(let xB = 0; aN+xN+bN+aB+xB <= n; xB++) {
-            I[aN][xN][bN][aB][xB] = [];
-            for(let bB = 0; aN+xN+bN+aB+xB+bB <= n; bB++) {
-              I[aN][xN][bN][aB][xB][bB] = {aN,xN,bN,aB,xB,bB};
-            }
-          }
+        for(let B = 0; aN+xN+bN+B <= n; B++) {
+          I[aN][xN][bN][B] = {aN,xN,bN,B};
         }
       }
     }
@@ -37,21 +31,21 @@ const buildModel = (fM,fB,w,n,k) => {
     variables: {},
   };
 
-  tuples(n).reverse().forEach(({ aN, xN, bN, aB, xB, bB }) => {
-    model.variables[`${aN}-${xN}-${bN}-${aB}-${xB}-${bB}`] = {
+  tuples(n).reverse().forEach(({ aN, xN, bN, B }) => {
+    model.variables[`${aN}-${xN}-${bN}-${B}`] = {
       // number choosing node in ne
       // times utility of choosing it as a function of agents
       // minus
       // number choosing node in opt
       // times utility choosing it as function of agents plus defector?
-      defectionTerm: aN * fM(aN+xN+aB+xB) - bN * fM(aN + xN + 1 + aB + xB), // A^T
-      blindDefectionTerm: aB * fB(aN+xN+aB+xB) - bB * fB(aN + xN + 1 + aB + xB), // A^T
+      defectionTerm: aN * fM(aN+xN+B) - bN * fM(aN + xN + 1 + B), // A^T
+      //blindDefectionTerm: B * fB(aN+xN+B) - B * fB(aN + xN + 1 + B), // A^T
       // comes from U(ne) - U(opti, ne-i)
       // paper claims U(opti,ne-i) = [xf(a+x) - bf(a+x+1)]\theta(axb)
-      wax: w(aN + xN + aB + xB), // B^T
-      wxb: w(xN + bN + xB + bB), // C^T
+      wax: w(aN + xN + B), // B^T
+      wxb: w(xN + bN + B), // C^T
       axbNom: aN + xN + bN,
-      axbBli: aB + xB + bB,
+      axbBli: B,
     };
   });
 
