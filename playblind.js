@@ -10,11 +10,11 @@ if(process.argv[2] === "mc") {
   const fmc = n => i => i === 1 ? 1 : 0;
   const fbl = n => i => 1;
 
-  for(let n = 2; n <= 5; n++) {
+  for(let n = 2; n < 5; n++) {
     for(let k = 0; k <= n; k ++) {
       const model = buildModel(fmc(n),fbl(n),w(n),n,k)
       console.log(`cover mc${n}, ${k} : `, solver.Solve(model))
-      //console.log(model.constraints)
+      console.log(model.constraints)
     }
   }
   //const cmc2 = buildModel(fmc(2),w(1),2,0)
