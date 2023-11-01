@@ -1,38 +1,26 @@
 const solver = require("javascript-lp-solver");
-const buildModel = require("./poa-model.js");
+const buildModel = require("./poa-model-two-utils.js");
 
 
 // coverage welfare
 const w = n => i => (i === 0 || i > n) ? 0 : 1;
 
-if(process.argv[2] == "blind") {
-  const fblind = n => i => 1;
-  const cblind2 = buildModel(fblind(3),w(3),3)
-  console.log("cover blind 2: ", solver.Solve(cblind2))
-  console.table(cblind2.variables)
-}
-
 // mc utility
 if(process.argv[2] === "mc") {
   const fmc = n => i => i === 1 ? 1 : 0;
+  const fbl = n => i => 1;
 
-  const cmc2 = buildModel(fmc(2),w(2),2)
-  console.log("cover mc 2: ", solver.Solve(cmc2))
-  console.table(cmc2.variables)
-  const cmc3 = buildModel(fmc(3),w(3),3)
-  console.log("cover mc 3: ", solver.Solve(cmc3))
-  console.table(cmc3.variables)
-  const cmc20 = buildModel(fmc(20),w(20),20)
-  console.log("cover mc 20: ", solver.Solve(cmc20))
-  //console.table(cmc20.variables)
-
-  // seems legit, pretty consistently get poa 1/2
-  // the wierd thing is which tuples get theta > 0
-  // if I feed them to the lp solver in the order I
-  // generate them, it settles on the first one that
-  // gives that max result, which for n>2 often doesn't
-  // have all agents on opt or ne. Sending the tuples
-  // in reverse seems to "fix" that.
+  for(let n = 2; n < 5; n++) {
+    for(let k = 0; k <= n; k ++) {
+      const model = buildModel(fmc(n),fbl(n),w(n),n,k)
+      console.log(`cover mc${n}, ${k} : `, solver.Solve(model))
+      console.log(model.constraints)
+    }
+  }
+  //const cmc2 = buildModel(fmc(2),w(1),2,0)
+  //console.log("cover mc 2: ", solver.Solve(cmc2))
+  //console.log(cmc2.constraints)
+  //console.table(cmc2.variables)
 }
 
 // es utility
@@ -99,4 +87,3 @@ if(process.argv[2] === "star") {
 
   // this seems right (maybe?) for n = 2, but not for anything else...
 }
-console.log(Math.E, 1/Math.E, 1-1/Math.E)
