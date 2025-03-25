@@ -7,7 +7,9 @@ const tuples = n => {
     for(let x = 0; a+x <= n; x++) {
       I[a][x] = [];
       for(let b = 0; a+x+b <= n; b++) {
-        I[a][x][b] = {a,x,b};
+        if(a+x+b >= 2) {
+          I[a][x][b] = {a,x,b};
+        }
       }
     }
   }
