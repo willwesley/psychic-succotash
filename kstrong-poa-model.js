@@ -22,20 +22,23 @@ const buildModel = (f,w,n,k) => {
     optimize: "wxo",
     opType: "max",
     constraints: {
-      equilibriumTerm1: { min: 0 },
-      //equilibriumTerm2: { min: 0 },
       wex: { equal: 1 },
     },
     variables: {},
   };
+  for(let i = 1; i <= k; i++) {
+    model.constraints['equilibriumTerm' + i] = { min: 0 }
+  }
 
   tuples(n,k).reverse().forEach(({ e, x, o }) => {
     model.variables[`${e}-${x}-${o}`] = {
-      equilibriumTerm1: eqTerm(1, n, f, e, x, o),
-      //equilibriumTerm2: eqTerm(2, n, f, e, x, o),
       wex: w(e + x),
       wxo: w(x + o),
     };
+    for(let i = 1; i <= k; i++) {
+      model.variables[`${e}-${x}-${o}`]['equilibriumTerm' + i] = 
+        eqTerm(i, n, f, e, x, o)
+    }
   });
 
   return model;
