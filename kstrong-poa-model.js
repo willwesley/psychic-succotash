@@ -17,6 +17,10 @@ const tuples = (n,k) => {
   return I.flat(2)
 }
 
+// f: utility function
+// w: welfare function
+// n: number of agents
+// k: maximum koalition size
 const buildModel = (f,w,n,k) => {
   const model = {
     optimize: "wxo",

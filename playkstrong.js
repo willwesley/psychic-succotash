@@ -1,87 +1,45 @@
+const { argv } = require('yargs')
 const solver = require("javascript-lp-solver");
 const buildModel = require("./kstrong-poa-model.js");
 
+// number of agents
+const N = argv.N || 20
+// max size of coalitions
+const K = argv.K || 1
+// coverage requirement
+const Z = argv.Z || 1
 
 // coverage welfare
-const w = n => i => (i === 0 || i > n) ? 0 : 1;
+const w = n => i => (i < Z || i > n) ? 0 : 1;
 
-// welfare utility
-if(process.argv[2] === "welfare") {
-  if(process.argv[3] === 'inspect') {
-    const tests = [ 2, 3, 4, 20 ]
-    tests.forEach(i => {
-      const cmc = buildModel(fmc(i),w(i),i,2)
-      console.log(`cover mc ${i}: `, solver.Solve(cmc))
-      i < 4 && console.table(cmc.variables)
-    })
-  } else {
-    ([...Array(20)].map((_, i) => i + 1)).forEach(i => {
-      const cmc = buildModel(w(20),w(20),20,i)
-      console.log(solver.Solve(cmc).result)
-    })
-  }
+// utility function
+let f
+switch(argv.F) {
+  case 'mc':
+    f = n => i => w(n)(i) - w(n)(i - 1)
+    break
+  case 'es':
+    f = n => i => w(n)(i)/i
+    break
+  case 'star':
+    const fact = n => n <= 0 ? 1 : n * fact(n-1);
+    const sumna = j => j > 0 ? [...Array(j-1).keys()]
+      .map(i => 1/fact(i))
+      .reduce((a,b) => a + b, 0) : 0;
+    f = n => i => fact(i-1)/(Math.E - 1) * (Math.E - sumna(i));
+    break
 }
 
-// mc utility
-if(process.argv[2] === "mc") {
-  const fmc = n => i => i === 1 ? 1 : 0;
-
-  if(process.argv[3] === 'inspect') {
-    const tests = [ 2, 3, 4, 20 ]
-    tests.forEach(i => {
-      const cmc = buildModel(fmc(i),w(i),i,1)
-      console.log(`cover mc ${i}: `, solver.Solve(cmc))
-      i < 4 && console.table(cmc.variables)
-    })
-  } else {
-    ([...Array(20)].map((_, i) => i + 1)).forEach(i => {
-      const cmc = buildModel(fmc(20),w(20),20,i)
-      console.log(solver.Solve(cmc).result)
-    })
-  }
-}
-
-// es utility
-// TODO: kstrong?
-if(process.argv[2] === "es") {
-  const fes = n => i => i > 0 && i <= n ? 1/i : 0;
-
-  if(process.argv[3] === 'inspect') {
-    const tests = [ 2, 3, 4, 20 ]
-    tests.forEach(i => {
-      const cmc = buildModel(fes(i),w(i),i,1)
-      console.log(`cover mc ${i}: `, solver.Solve(cmc))
-      i < 4 && console.table(cmc.variables)
-    })
-  } else {
-    ([...Array(20)].map((_, i) => i + 1)).forEach(i => {
-      const cmc = buildModel(fes(20),w(20),20,i)
-      console.log(solver.Solve(cmc).result)
-    })
-  }
-}
-
-// fstar utility
-// TODO: kstrong?
-if(process.argv[2] === "star") {
-  const fact = n => n <= 0 ? 1 : n * fact(n-1);
-  const sumna = j => j > 0 ? [...Array(j-1).keys()]
-    .map(i => 1/fact(i))
-    .reduce((a,b) => a + b, 0) : 0;
-
-  const fstar = n => i => fact(i-1)/(Math.E - 1) * (Math.E - sumna(i));
-
-  if(process.argv[3] === 'inspect') {
-    const tests = [ 2, 3, 4, 20 ]
-    tests.forEach(i => {
-      const cmc = buildModel(fstar(i),w(i),i,1)
-      console.log(`cover mc ${i}: `, solver.Solve(cmc))
-      i < 4 && console.table(cmc.variables)
-    })
-  } else {
-    ([...Array(20)].map((_, i) => i + 1)).forEach(i => {
-      const cmc = buildModel(fstar(20),w(20),20,i)
-      console.log(solver.Solve(cmc).result)
-    })
-  }
+if(argv.inspect) {
+  const tests = [ 2, 3, 4, 20 ]
+  tests.forEach(i => {
+    const W = buildModel(f(i),w(i),i,K)
+    console.log(`N=${i}: `, solver.Solve(W))
+    i < 4 && console.table(W.variables)
+  })
+} else {
+  ([...Array(N)].map((_, i) => i + 1)).forEach(i => {
+    const W = buildModel(w(N),w(N),N,i)
+    console.log(solver.Solve(W).result)
+  })
 }

@@ -1,0 +1,24 @@
+mc(i) = w(i)-w(i-1)
+es(i) = w(i)/i
+
+make graphs!
+
+
+paper idea:
+- lp for z-cover k-strong PoA
+  Q: how to verify correct?
+    - normalize w(1) - drb thinks my stuff shouldn't be working bc w(1)=0
+    - look at screwing with I for Z > 1
+- numerically explore various util functions
+- generate worst-case examples (suprised at 1/37 got n=20, k=2, z=2)
+  - run austin's algo suite on these
+- main idea? can we emulate collaboration with randomization
+- or: random is better than bad collab?
+
+construct worst case games, does/can we show that one agent flipping "cascades" to opt?
+
+
+continuous relaxation, lawl.
+
+allerton conference: https://allerton.csl.illinois.edu/
+
