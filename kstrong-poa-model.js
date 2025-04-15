@@ -31,22 +31,29 @@ const buildModel = (f,w,n,k) => {
     variables: {},
   };
   for(let i = 1; i <= k; i++) {
-    model.constraints['equilibriumTerm' + i] = { min: 0 }
+    model.constraints['equilibriumTerm' + padzero(i)] = { min: 0 }
   }
 
-  tuples(n,k).reverse().forEach(({ e, x, o }) => {
-    model.variables[`${e}-${x}-${o}`] = {
+  tuples(n,k).forEach(({ e, x, o }) => {
+    const variable = `${padzero(e)}-${padzero(x)}-${padzero(o)}`
+    model.variables[variable] = {
       wex: w(e + x),
       wxo: w(x + o),
     };
     for(let i = 1; i <= k; i++) {
-      model.variables[`${e}-${x}-${o}`]['equilibriumTerm' + i] = 
+      model.variables[variable]['equilibriumTerm' + padzero(i)] = 
         eqTerm(i, n, f, e, x, o)
     }
   });
 
   return model;
 };
+
+const padzero = (n) => {
+  const stupid = '0' + n
+  return stupid.slice(stupid.length - 2)
+}
+console.log(padzero(5), padzero(13))
 
 const eqTerm = (k, n, w, e, x, o) => {
   const eqwelfare = poch(n, k) * w(e + x)
@@ -68,15 +75,24 @@ const poch = (x,y) => {
   if(x < y || x < 0 || y < 0) {
     return 0
   }
-  const bottom = x - y
-  let result = 1
-  for(let i = x; i > bottom; i--) {
-    result *= i
-  }
-  return result
+  return fact(x) / fact(x-y)
+
+  //const bottom = x - y
+  //let result = 1
+  //for(let i = x; i > bottom; i--) {
+  //  result *= i
+  //}
+  //return result
 }
 
-const fact = n => (n <= 1) ? 1 : (n * fact(n - 1))
+const factMemos = [1]
+const fact = n => {
+  //(n <= 1) ? 1 : (n * fact(n - 1))
+  if(factMemos[n] === undefined) {
+    factMemos[n] = n * fact(n - 1)
+  }
+  return factMemos[n]
+}
 
 // newton generalization of binomial says binom(a,b) = poch(a,b)/k!
 const binom = (a,b) => poch(a,b) / fact(b)

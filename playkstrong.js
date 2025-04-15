@@ -1,3 +1,4 @@
+const fs = require('node:fs')
 const { argv } = require('yargs')
 const solver = require("javascript-lp-solver");
 const buildModel = require("./kstrong-poa-model.js");
@@ -28,18 +29,20 @@ switch(argv.F) {
       .reduce((a,b) => a + b, 0) : 0;
     f = n => i => fact(i-1)/(Math.E - 1) * (Math.E - sumna(i));
     break
+  default:
+    f = w
 }
 
 if(argv.inspect) {
-  const tests = [ 2, 3, 4, 20 ]
-  tests.forEach(i => {
-    const W = buildModel(f(i),w(i),i,K)
-    console.log(`N=${i}: `, solver.Solve(W))
-    i < 4 && console.table(W.variables)
-  })
+  const W = buildModel(f(N),w(N),N,K)
+  console.log(solver.Solve(W))
+  console.table(W.variables)
 } else {
-  ([...Array(N)].map((_, i) => i + 1)).forEach(i => {
-    const W = buildModel(w(N),w(N),N,i)
-    console.log(solver.Solve(W).result)
+  const values = [...Array(N)].map((_, i) => i + 1).map(i => {
+    const W = buildModel(f(N),w(N),N,i)
+    const { result } = solver.Solve(W)
+    console.log(result)
+    return 1/result
   })
+  fs.writeFile('out.json', JSON.stringify(values), console.log)
 }
