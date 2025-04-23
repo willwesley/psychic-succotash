@@ -41,7 +41,7 @@ if(argv.inspect) {
   const values = [...Array(N)].map((_, i) => i + 1).map(i => {
     const W = buildModel(f(N),w(N),N,i)
     const { result } = solver.Solve(W)
-    console.log(result)
+    //console.log(result)
     return 1/result
   })
   fs.writeFile('out.json', JSON.stringify(values), console.log)

@@ -42,7 +42,7 @@ const buildModel = (f,w,n,k) => {
     };
     for(let i = 1; i <= k; i++) {
       model.variables[variable]['equilibriumTerm' + padzero(i)] = 
-        eqTerm(i, n, f, e, x, o)
+        newEqTerm(i, n, f, e, x, o)
     }
   });
 
@@ -64,6 +64,23 @@ const eqTerm = (k, n, w, e, x, o) => {
   const summation = alphas.map(a => 
     [...Array(k-a+1)].map((_,b) => alternateTerm(a, b)).reduce(sum, 0)
   ).reduce(sum, 0)
+  return eqwelfare - summation
+}
+
+const newEqTerm = (k, n, w, e, x, o) => {
+  const eqwelfare = binom(n, k) * w(e + x)
+  const alternateTerm = (a, b) => binom(e, a) * binom(o, b) * binom(n-e-o, k-a-b) * w(e+x+b-a)
+  const alphas = [...Array(k+1)].map((_, i) => i)
+  const terms = []
+  for(let a = 0; a <= e; a++) {
+    for(let b = 0; b <= o; b++) {
+      if(a + b <= k) {
+        terms.push(alternateTerm(a, b))
+      }
+    }
+  }
+  //console.log(`${padzero(e)}-${padzero(x)}-${padzero(o)}-${k}`, terms, eqwelfare)
+  const summation = terms.reduce(sum, 0)
   return eqwelfare - summation
 }
 

@@ -12,6 +12,9 @@ s = ArgParseSettings()
     "--old"
     help = "use the original paper eq terms"
     action = :store_true
+    "--newer"
+    help = "use the eq terms in the newer paper"
+    action = :store_true
     "-K"
     help = "maximum coalition size"
     arg_type = Int
@@ -66,8 +69,25 @@ function doit(N, K)
                 I
             )) * θ) ≥ 0,
         )
+    elseif (parsed_args["newer"])
+        for ζ = 1:K
+            push!(
+                constraints,
+                sum(transpose(
+                    map(
+                        ((e, x, o),) ->
+                            binomial(N, ζ) * w(e + x) - sum([
+                                binomial(e, α) *
+                                binomial(o, β) *
+                                binomial(N-e-o, ζ - α - β) *
+                                w(e + x + β - α) for α = 0:e for β = 0:o if α + β ≤ ζ
+                            ]),
+                        I,
+                    ),
+                ) * θ) ≥ 0,
+            )
+        end
     else
-        # these are the kstrong equilibrium terms
         for ζ = 1:K
             push!(
                 constraints,
